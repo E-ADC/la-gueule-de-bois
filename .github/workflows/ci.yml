@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [dev, preprod, main]
+  push:
+    branches: [dev, preprod, main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint
+        run: echo "TODO: brancher le linter une fois la stack choisie"
+
+  build:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: echo "TODO: brancher le build"
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tests
+        run: echo "TODO: brancher les tests unitaires"

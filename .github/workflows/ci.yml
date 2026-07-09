@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Lint
-        run: echo "TODO: brancher le linter une fois la stack choisie"
+        run: echo "TODO - brancher le linter une fois la stack choisie"
 
   build:
     runs-on: ubuntu-latest
@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build
-        run: echo "TODO: brancher le build"
+        run: echo "TODO - brancher le build"
 
   test:
     runs-on: ubuntu-latest
@@ -28,4 +28,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Tests
-        run: echo "TODO: brancher les tests unitaires"
+        run: echo "TODO - brancher les tests unitaires"

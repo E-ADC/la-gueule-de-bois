@@ -19,6 +19,7 @@ Deadline : < 1 mois. Hébergement cible : VPS OVH existant (2 vCores, 4 Go RAM, 
 |---|---|---|
 | Backend | Go 1.23+, routeur **chi**, accès DB **pgx**, migrations **golang-migrate** | Go validé explicitement par le prof, connu de l'équipe, binaire unique léger (VPS 4 Go), typage fort cohérent avec la conception UML |
 | Frontend | **React + Vite + TypeScript**, React Router, fetch | SPA choisie par l'équipe ; swipe (UC12) via framer-motion ou CSS transform |
+| Direction visuelle | Thème **« Ambrée »** — palette bière (caramel/cuivre/brun torréfié), Helvetica unique, bordures franches, ombres pleines | Choisi parmi 3 propositions le 2026-07-09 ; tokens dans `docs/design/theme-ambree.css` |
 | Base de données | **PostgreSQL 16** (conteneur Docker) | Relationnel classique, colle aux entités métier |
 | Prestataire externe | **Resend** (API email, SDK Go officiel) | Contrainte sujet « un prestataire extérieur ». 3 000 emails/mois gratuits. Appel API HTTPS (pas de SMTP sortant → pas de blocage port 25) |
 | Déploiement | **Docker Compose** sur le VPS : nginx → API Go → PostgreSQL | Simple, reproductible, déjà testé sur le VPS |

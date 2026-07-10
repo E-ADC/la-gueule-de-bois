@@ -1,0 +1,13 @@
+# Secrets
+.env
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Backend
+backend/api
+backend/uploads/
+
+# Divers
+*.log

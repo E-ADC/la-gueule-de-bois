@@ -1,0 +1,180 @@
+/* ==========================================================================
+   La Gueule de Bois — Thème « Ambrée »
+   Direction visuelle validée le 2026-07-09 (template 2 / brasserie artisanale)
+   À importer tel quel dans le futur frontend (Vite : import './theme-ambree.css')
+   Police unique : Helvetica. La personnalité vient des graisses/casse.
+   ========================================================================== */
+
+:root {
+  /* --- Palette --- */
+  --bg: #f0dfc3;            /* caramel clair : fond de page */
+  --surface: #f9efdb;       /* papier : cartes, panneaux */
+  --ink: #38200e;           /* brun torréfié : texte, bordures */
+  --muted: #6d4c2c;         /* texte secondaire */
+  --malt: #d9bd91;          /* séparateurs, états désactivés */
+  --accent: #c2540a;        /* cuivre : CTA, scores, liens */
+  --accent-ink: #fdf3e0;    /* texte posé sur le cuivre */
+
+  /* --- Sémantique (hors accent) --- */
+  --success: #4d6b2f;
+  --danger: #9b2c14;
+
+  /* --- Forme --- */
+  --border: 2px solid var(--ink);
+  --shadow: 5px 5px 0 rgba(56, 32, 14, 0.9);   /* ombre pleine, pas de flou */
+  --shadow-sm: 3px 3px 0 var(--ink);
+  --radius: 6px;
+
+  /* --- Typo --- */
+  --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --fs-h1: clamp(28px, 4vw, 40px);
+  --fs-h2: clamp(22px, 3vw, 28px);
+  --fs-body: 15px;
+  --fs-small: 13px;
+}
+
+/* --- Base --- */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  line-height: 1.55;
+}
+
+h1, h2 {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  margin: 0 0 0.5em;
+}
+h1 { font-size: var(--fs-h1); }
+h2 { font-size: var(--fs-h2); }
+h3 { font-weight: 800; margin: 0 0 0.5em; }
+
+a { color: var(--accent); font-weight: 700; }
+
+.label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+/* --- Boutons --- */
+.btn {
+  display: inline-block;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 11px 20px;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+}
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: var(--shadow-sm);
+}
+.btn-primary:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: var(--border);
+}
+.btn-danger { background: var(--danger); color: var(--accent-ink); box-shadow: var(--shadow-sm); }
+.btn:disabled { background: var(--malt); color: var(--muted); box-shadow: none; cursor: not-allowed; }
+.btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* --- Cartes / panneaux --- */
+.card {
+  background: var(--surface);
+  border: var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+.card-title {
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: 20px;
+  margin: 0 0 4px;
+}
+.card-meta { font-size: var(--fs-small); color: var(--muted); font-weight: 600; margin: 0 0 14px; }
+
+/* --- Badges --- */
+.badge {
+  display: inline-block;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+.badge-locked { background: var(--malt); color: var(--muted); }
+
+/* --- Classement --- */
+.rank-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+}
+.rank-row + .rank-row { border-top: 2px dashed var(--malt); }
+.rank-row .rank { width: 26px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.rank-row .pts { font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; margin-left: auto; }
+.avatar {
+  width: 34px; height: 34px;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--accent-ink);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800;
+  flex-shrink: 0;
+}
+
+/* --- Formulaires --- */
+.input, .select, .textarea {
+  font-family: inherit;
+  font-size: var(--fs-body);
+  color: var(--ink);
+  background: var(--surface);
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  width: 100%;
+}
+.input:focus-visible, .select:focus-visible, .textarea:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 1px;
+}
+.field-error { color: var(--danger); font-size: var(--fs-small); font-weight: 700; }
+
+/* --- Carte swipe (UC12) --- */
+.swipe-card {
+  background: var(--surface);
+  border: var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  max-width: 380px;
+  touch-action: pan-y;
+}
+.swipe-actions { display: flex; gap: 12px; justify-content: center; margin-top: 16px; }
+
+/* --- Divers --- */
+.table-wrap { overflow-x: auto; }
+.sep { border: none; border-top: 2px dashed var(--malt); margin: 24px 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

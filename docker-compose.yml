@@ -47,7 +47,8 @@ services:
       context: .
       dockerfile: deploy/nginx/Dockerfile
     ports:
-      - "80:80"
+      # 80 en prod (VPS) ; surcharger HTTP_PORT en local si le port est pris
+      - "${HTTP_PORT:-80}:80"
     volumes:
       - uploads:/data/uploads:ro
     depends_on:

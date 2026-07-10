@@ -71,16 +71,9 @@ export interface Badge {
   seuilScore: number
 }
 
-/** Déblocage d'un badge par un utilisateur (table de liaison). */
-export interface UserBadge {
-  userId: number
-  badgeId: number
-  debloqueLe: string
-}
-
-/** Enveloppe renvoyée par GET /api/me/badges. */
+/** Enveloppe renvoyée par GET /api/me/badges (`obtenus` = Badge complets). */
 export interface MyBadgesResponse {
-  obtenus: UserBadge[]
+  obtenus: Badge[]
   tous: Badge[]
 }
 

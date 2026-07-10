@@ -36,11 +36,11 @@ export function ProfilePage() {
     return <Loading label="Chargement du profil…" />
   }
 
-  // GET /me/badges renvoie { obtenus: UserBadge[], tous: Badge[] } :
+  // GET /me/badges renvoie { obtenus: Badge[], tous: Badge[] } :
   // l'état "obtenu / à débloquer" se reconstruit en croisant les deux listes.
   const obtenusIds =
     state.status === 'ready'
-      ? new Set(state.badges.obtenus.map((userBadge) => userBadge.badgeId))
+      ? new Set(state.badges.obtenus.map((badge) => badge.id))
       : new Set<number>()
 
   return (

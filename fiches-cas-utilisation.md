@@ -83,8 +83,8 @@ Formalisme utilisé (cours "Modélisation avec UML") : cas, résumé, acteur pri
 | **acteur secondaire** | Système de scoring |
 | **pré-conditions** | Utilisateur connecté |
 | **résultats** | La soirée est créée ; le score de l'utilisateur est recalculé |
-| **description** | 1. L'utilisateur saisit les informations de la soirée (date, lieu, participants…)<br>2. Le système enregistre la soirée<br>3. Le système inclut **UC16** (Recalculer le score de l'utilisateur) |
-| **exceptions** | Champs obligatoires manquants → création refusée |
+| **description** | 1. L'utilisateur saisit les informations de la soirée (date, lieu, participants…)<br>2. Il peut joindre des photos (optionnel)<br>3. Le système enregistre la soirée et ses photos<br>4. Le système inclut **UC16** (Recalculer le score de l'utilisateur) |
+| **exceptions** | Champs obligatoires manquants → création refusée ; photo invalide (format ou taille) → photo rejetée, création poursuivie sans elle |
 
 ---
 
@@ -97,7 +97,7 @@ Formalisme utilisé (cours "Modélisation avec UML") : cas, résumé, acteur pri
 | **acteur secondaire** | Système de scoring |
 | **pré-conditions** | La soirée existe et appartient à l'utilisateur |
 | **résultats** | La soirée est mise à jour ; le score est recalculé |
-| **description** | 1. L'utilisateur sélectionne la soirée à modifier<br>2. Il modifie les champs souhaités<br>3. Le système enregistre les modifications<br>4. Le système inclut **UC16** |
+| **description** | 1. L'utilisateur sélectionne la soirée à modifier<br>2. Il modifie les champs souhaités et peut ajouter/retirer des photos<br>3. Le système enregistre les modifications<br>4. Le système inclut **UC16** |
 | **exceptions** | Utilisateur non propriétaire de la soirée → modification refusée |
 
 ---
@@ -122,10 +122,10 @@ Formalisme utilisé (cours "Modélisation avec UML") : cas, résumé, acteur pri
 |---|---|
 | **résumé** | L'utilisateur associe un autre utilisateur comme témoin d'une soirée |
 | **acteur primaire** | Utilisateur |
-| **acteur secondaire** | — |
+| **acteur secondaire** | Service d'email (prestataire Resend) ; Utilisateur invité (notifié) |
 | **pré-conditions** | La soirée existe et appartient à l'utilisateur ; le témoin invité possède un compte |
 | **résultats** | Le témoin est associé à la soirée (notification envoyée) |
-| **description** | 1. L'utilisateur sélectionne une soirée<br>2. Il choisit un utilisateur à inviter comme témoin<br>3. Le système enregistre l'invitation et notifie le témoin |
+| **description** | 1. L'utilisateur sélectionne une soirée<br>2. Il choisit un utilisateur à inviter comme témoin<br>3. Le système enregistre l'invitation<br>4. Le système notifie le témoin par email via le **Service d'email** |
 | **exceptions** | Utilisateur invité inexistant → invitation refusée |
 
 ---
@@ -192,10 +192,10 @@ Formalisme utilisé (cours "Modélisation avec UML") : cas, résumé, acteur pri
 |---|---|
 | **résumé** | Le système attribue automatiquement un badge à un utilisateur qui remplit les conditions, à l'issue d'un recalcul de score |
 | **acteur primaire** | — *(aucun acteur externe : ce cas n'est jamais déclenché directement, uniquement inclus par UC16)* |
-| **acteur secondaire** | Utilisateur (notifié) |
+| **acteur secondaire** | Service d'email (prestataire Resend) ; Utilisateur (notifié) |
 | **pré-conditions** | UC16 vient de s'exécuter |
 | **résultats** | Un nouveau badge est attribué à l'utilisateur ; notification envoyée |
-| **description** | 1. Le système évalue les critères de badges avec le score mis à jour<br>2. Si un critère est atteint, le système attribue le badge<br>3. Le système notifie l'utilisateur |
+| **description** | 1. Le système évalue les critères de badges avec le score mis à jour<br>2. Si un critère est atteint, le système attribue le badge<br>3. Le système notifie l'utilisateur par email via le **Service d'email** |
 | **exceptions** | Aucun critère atteint → aucun badge attribué |
 
 ---
@@ -290,10 +290,10 @@ Formalisme utilisé (cours "Modélisation avec UML") : cas, résumé, acteur pri
 |---|---|
 | **résumé** | L'utilisateur propose une relation d'ami à un autre utilisateur |
 | **acteur primaire** | Utilisateur |
-| **acteur secondaire** | — |
+| **acteur secondaire** | Service d'email (prestataire Resend) ; Utilisateur destinataire (notifié) |
 | **pré-conditions** | Utilisateur connecté ; destinataire existant |
 | **résultats** | Une demande d'ami est envoyée, en attente de réponse |
-| **description** | 1. L'utilisateur sélectionne un autre utilisateur<br>2. Il envoie une demande d'ami<br>3. Le système enregistre la demande et notifie le destinataire |
+| **description** | 1. L'utilisateur sélectionne un autre utilisateur<br>2. Il envoie une demande d'ami<br>3. Le système enregistre la demande<br>4. Le système notifie le destinataire par email via le **Service d'email** |
 | **exceptions** | Demande déjà envoyée ou déjà amis → action ignorée |
 
 ---
@@ -304,8 +304,8 @@ Formalisme utilisé (cours "Modélisation avec UML") : cas, résumé, acteur pri
 |---|---|
 | **résumé** | Le modérateur examine un témoignage signalé et décide d'une action |
 | **acteur primaire** | Modérateur |
-| **acteur secondaire** | Utilisateur (auteur du témoignage, notifié) |
+| **acteur secondaire** | Service d'email (prestataire Resend) ; Utilisateur (auteur du témoignage, notifié) |
 | **pré-conditions** | Au moins un signalement est en attente (créé via **UC13**) |
 | **résultats** | Le signalement est clos ; le témoignage est conservé ou supprimé |
-| **description** | 1. Le modérateur consulte la liste des signalements en attente<br>2. Il examine le témoignage signalé et le motif<br>3. Il décide : rejeter le signalement ou supprimer le témoignage<br>4. Le système applique la décision et notifie l'auteur si besoin |
+| **description** | 1. Le modérateur consulte la liste des signalements en attente<br>2. Il examine le témoignage signalé et le motif<br>3. Il décide : rejeter le signalement ou supprimer le témoignage<br>4. Le système applique la décision et notifie l'auteur si besoin, par email via le **Service d'email** |
 | **exceptions** | Signalement déjà traité → action ignorée |

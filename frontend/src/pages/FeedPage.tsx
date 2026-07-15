@@ -10,8 +10,14 @@ type LoadState =
   | { status: 'error'; message: string }
   | { status: 'ready'; soirees: Soiree[] }
 
+type InvitedState =
+  | { status: 'loading' }
+  | { status: 'error' }
+  | { status: 'ready'; soirees: Soiree[] }
+
 export function FeedPage() {
   const [state, setState] = useState<LoadState>({ status: 'loading' })
+  const [invited, setInvited] = useState<InvitedState>({ status: 'loading' })
   const [reloadToken, setReloadToken] = useState(0)
 
   useEffect(() => {
@@ -26,6 +32,19 @@ export function FeedPage() {
           status: 'error',
           message: err instanceof ApiError ? err.message : 'Le chargement des soirées a échoué.',
         })
+      })
+    return () => controller.abort()
+  }, [reloadToken])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    setInvited({ status: 'loading' })
+    soireesApi
+      .listInvitations(controller.signal)
+      .then((soirees) => setInvited({ status: 'ready', soirees: soirees ?? [] }))
+      .catch(() => {
+        if (controller.signal.aborted) return
+        setInvited({ status: 'error' })
       })
     return () => controller.abort()
   }, [reloadToken])
@@ -72,6 +91,27 @@ export function FeedPage() {
             </li>
           ))}
         </ul>
+      )}
+
+      {/* UC09 : soirées où je suis invité comme témoin — sans cette section,
+          un témoin invité n'a aucun moyen de retrouver la soirée dans l'app. */}
+      {invited.status === 'ready' && invited.soirees.length > 0 && (
+        <>
+          <hr className="sep" />
+          <h2>Soirées où je suis témoin</h2>
+          <ul className="soiree-grid">
+            {invited.soirees.map((soiree) => (
+              <li key={soiree.id}>
+                <Link to={`/soirees/${soiree.id}`} className="card soiree-card">
+                  <p className="card-title">{soiree.titre}</p>
+                  <p className="card-meta">
+                    {soiree.lieu} · {new Date(soiree.date).toLocaleDateString('fr-FR')}
+                  </p>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
     </div>
   )

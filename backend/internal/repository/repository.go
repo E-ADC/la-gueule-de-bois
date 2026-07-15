@@ -62,6 +62,10 @@ type PhotoRepository interface {
 type TemoinInvitationRepository interface {
 	Create(ctx context.Context, inv *models.TemoinInvitation) error
 	IsInvited(ctx context.Context, soireeID, userID int64) (bool, error)
+	// ListSoireesForInvite liste les soirées où l'utilisateur a été invité
+	// comme témoin — sans quoi un témoin invité n'a aucun moyen de
+	// retrouver la soirée dans l'app.
+	ListSoireesForInvite(ctx context.Context, userID int64) ([]models.Soiree, error)
 }
 
 // TemoignageRepository gère les témoignages (UC11).

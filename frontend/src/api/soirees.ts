@@ -44,4 +44,7 @@ export const soireesApi = {
     return soiree
   },
   remove: (id: string) => api.del<void>(`/soirees/${id}`),
+  // UC09 : soirées où l'utilisateur connecté a été invité comme témoin.
+  listInvitations: (signal?: AbortSignal) =>
+    api.get<Soiree[]>('/soirees/invitations', signal),
 }

@@ -104,3 +104,10 @@ func (s *TemoignageService) ListBySoiree(ctx context.Context, soireeID int64) ([
 func (s *TemoignageService) Get(ctx context.Context, id int64) (*models.Temoignage, error) {
 	return s.temoignages.GetByID(ctx, id)
 }
+
+// ListInvitedSoirees liste les soirées où l'utilisateur a été invité comme
+// témoin (UC09) — nécessaire pour qu'il puisse retrouver la soirée dans
+// l'app et y publier un témoignage (UC11).
+func (s *TemoignageService) ListInvitedSoirees(ctx context.Context, userID int64) ([]models.Soiree, error) {
+	return s.invitations.ListSoireesForInvite(ctx, userID)
+}

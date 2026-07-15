@@ -1,6 +1,8 @@
 # Convention de branches
 
-Format : `type(scope):description`
+Format : `type(scope)-description`
+
+> Note : git interdit le caractère `:` dans un nom de branche, d'où le `-`.
 
 Types autorisés :
 - `feat` — nouvelle fonctionnalité
@@ -8,8 +10,8 @@ Types autorisés :
 - `style` — changement visuel/CSS sans impact fonctionnel
 
 Exemples :
-- `feat(frontend):homepage`
-- `fix(api):videos`
+- `feat(frontend)-homepage`
+- `fix(api)-videos`
 
 ## Workflow
 1. Créer une branche depuis `dev`

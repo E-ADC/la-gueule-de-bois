@@ -1,0 +1,13 @@
+DROP TABLE IF EXISTS demandes_amis;
+DROP TABLE IF EXISTS signalements;
+DROP TABLE IF EXISTS groupe_membres;
+DROP TABLE IF EXISTS groupes;
+DROP TABLE IF EXISTS user_badges;
+DROP TABLE IF EXISTS badges;
+DROP TABLE IF EXISTS votes;
+DROP TABLE IF EXISTS temoignages;
+DROP TABLE IF EXISTS temoin_invitations;
+DROP TABLE IF EXISTS photos;
+DROP TABLE IF EXISTS soirees;
+DROP TABLE IF EXISTS sessions;
+DROP TABLE IF EXISTS users;

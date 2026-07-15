@@ -1,0 +1,59 @@
+# La Gueule de Bois — déploiement VPS (nginx → API Go → PostgreSQL)
+# Variables sensibles dans un fichier .env (voir .env.example)
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: gueuledebois
+      POSTGRES_USER: gueuledebois
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?definir POSTGRES_PASSWORD dans .env}
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gueuledebois -d gueuledebois"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # One-shot : applique les migrations SQL avant le démarrage de l'API
+  migrate:
+    image: migrate/migrate:v4.18.1
+    volumes:
+      - ./backend/migrations:/migrations:ro
+    command: ["-path=/migrations", "-database=postgres://gueuledebois:${POSTGRES_PASSWORD}@db:5432/gueuledebois?sslmode=disable", "up"]
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgres://gueuledebois:${POSTGRES_PASSWORD}@db:5432/gueuledebois?sslmode=disable
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      SESSION_SECRET: ${SESSION_SECRET:?definir SESSION_SECRET dans .env}
+      UPLOAD_DIR: /data/uploads
+      PORT: "8080"
+    volumes:
+      - uploads:/data/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+  nginx:
+    build:
+      context: .
+      dockerfile: deploy/nginx/Dockerfile
+    ports:
+      # 80 en prod (VPS) ; surcharger HTTP_PORT en local si le port est pris
+      - "${HTTP_PORT:-80}:80"
+    volumes:
+      - uploads:/data/uploads:ro
+    depends_on:
+      - api
+
+volumes:
+  dbdata:
+  uploads:

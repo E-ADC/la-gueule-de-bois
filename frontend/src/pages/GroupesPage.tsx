@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { groupesApi } from '../api/groupes'
 import { ApiError } from '../api/client'
 import type { Groupe } from '../api/types'
@@ -15,6 +16,7 @@ export function GroupesPage() {
 
   // Formulaire créer groupe
   const [createForm, setCreateForm] = useState({ nom: '', error: '' })
+  const [createdGroupe, setCreatedGroupe] = useState<Groupe | null>(null)
 
   // Formulaire rejoindre groupe
   const [joinForm, setJoinForm] = useState({ id: '', error: '' })
@@ -46,8 +48,9 @@ export function GroupesPage() {
     }
 
     try {
-      await groupesApi.create(createForm.nom)
+      const groupe = await groupesApi.create(createForm.nom)
       setCreateForm({ nom: '', error: '' })
+      setCreatedGroupe(groupe)
       setReloadToken((t) => t + 1)
     } catch (err: unknown) {
       if (err instanceof ApiError) {
@@ -125,6 +128,12 @@ export function GroupesPage() {
               <button type="submit" className="btn btn-primary">
                 Créer
               </button>
+              {createdGroupe && (
+                <p className="label">
+                  Groupe « {createdGroupe.nom} » créé ! Partage cet ID pour que d'autres te
+                  rejoignent : <strong>{createdGroupe.id}</strong>
+                </p>
+              )}
             </form>
           </div>
 
@@ -161,15 +170,15 @@ export function GroupesPage() {
           )}
 
           {state.groupes.length > 0 && (
-            <ul style={{ listStyle: 'none', padding: 0 }}>
+            <ul className="soiree-grid">
               {state.groupes.map((groupe) => (
                 <li key={groupe.id}>
-                  <div className="card">
+                  <Link to={`/groupes/${groupe.id}`} className="card soiree-card">
                     <p className="card-title">{groupe.nom}</p>
                     <p className="card-meta">
-                      Créé le {new Date(groupe.createdAt).toLocaleDateString('fr-FR')}
+                      N°{groupe.id} · créé le {new Date(groupe.createdAt).toLocaleDateString('fr-FR')}
                     </p>
-                  </div>
+                  </Link>
                 </li>
               ))}
             </ul>

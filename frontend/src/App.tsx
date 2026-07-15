@@ -10,6 +10,7 @@ import { SoireeFormPage } from './pages/SoireeFormPage'
 import { SoireeDetailPage } from './pages/SoireeDetailPage'
 import { ClassementPage } from './pages/ClassementPage'
 import { GroupesPage } from './pages/GroupesPage'
+import { GroupeDetailPage } from './pages/GroupeDetailPage'
 import { AmisPage } from './pages/AmisPage'
 import { ProfilePage } from './pages/ProfilePage'
 import { PublicProfilePage } from './pages/PublicProfilePage'
@@ -39,6 +40,7 @@ export default function App() {
             <Route path="/soirees/:id/modifier" element={<SoireeFormPage />} />
             <Route path="/classement" element={<ClassementPage />} />
             <Route path="/groupes" element={<GroupesPage />} />
+            <Route path="/groupes/:id" element={<GroupeDetailPage />} />
             <Route path="/amis" element={<AmisPage />} />
             <Route path="/profil" element={<ProfilePage />} />
             <Route path="/utilisateurs/:id" element={<PublicProfilePage />} />

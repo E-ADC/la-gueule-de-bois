@@ -7,6 +7,7 @@ import { ApiError } from '../api/client'
 import type { Photo, Soiree, Temoignage } from '../api/types'
 import { useAuth } from '../auth/AuthContext'
 import { Loading, ErrorState, EmptyState } from '../components/StateViews'
+import { ThumbUpIcon, ThumbDownIcon } from '../components/VoteIcons'
 
 type LoadState =
   | { status: 'loading' }
@@ -289,35 +290,41 @@ export function SoireeDetailPage() {
         <ul className="temoignage-list">
           {temoignages.map((temoignage) => (
             <li key={temoignage.id} className="card temoignage-card">
-              <p className="card-meta">
-                {temoignage.auteurPseudo} ·{' '}
-                {new Date(temoignage.createdAt).toLocaleDateString('fr-FR')}
-              </p>
+              <div className="temoignage-header">
+                <span className="avatar">
+                  {temoignage.auteurAvatar ? (
+                    <img src={temoignage.auteurAvatar} alt={temoignage.auteurPseudo} />
+                  ) : (
+                    temoignage.auteurPseudo.slice(0, 2).toUpperCase()
+                  )}
+                </span>
+                <div>
+                  <p className="card-meta">
+                    <strong>{temoignage.auteurPseudo}</strong> ·{' '}
+                    {new Date(temoignage.createdAt).toLocaleDateString('fr-FR')}
+                  </p>
+                </div>
+              </div>
               <p>{temoignage.contenu}</p>
               <div className="vote-row">
-                {temoignage.monVote !== null ? (
-                  <span className="label">
-                    Tu as voté {temoignage.monVote === 1 ? '+1' : '−1'} · {temoignage.votesPositifs}{' '}
-                    positif(s), {temoignage.votesNegatifs} négatif(s)
-                  </span>
-                ) : (
-                  <>
-                    <button
-                      type="button"
-                      className="btn btn-ghost"
-                      onClick={() => void handleVote(temoignage.id, 1)}
-                    >
-                      +1 ({temoignage.votesPositifs})
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-ghost"
-                      onClick={() => void handleVote(temoignage.id, -1)}
-                    >
-                      −1 ({temoignage.votesNegatifs})
-                    </button>
-                  </>
-                )}
+                <button
+                  type="button"
+                  className={`vote-btn${temoignage.monVote === 1 ? ' vote-btn-active' : ''}`}
+                  disabled={temoignage.monVote !== null}
+                  onClick={() => void handleVote(temoignage.id, 1)}
+                  aria-label="Voter positivement"
+                >
+                  <ThumbUpIcon /> {temoignage.votesPositifs}
+                </button>
+                <button
+                  type="button"
+                  className={`vote-btn${temoignage.monVote === -1 ? ' vote-btn-active' : ''}`}
+                  disabled={temoignage.monVote !== null}
+                  onClick={() => void handleVote(temoignage.id, -1)}
+                  aria-label="Voter négativement"
+                >
+                  <ThumbDownIcon /> {temoignage.votesNegatifs}
+                </button>
                 <button
                   type="button"
                   className="btn btn-ghost"

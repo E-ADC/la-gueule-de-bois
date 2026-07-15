@@ -49,6 +49,7 @@ export interface Temoignage {
   contenu: string
   createdAt: string
   auteurPseudo: string
+  auteurAvatar?: string
   votesPositifs: number
   votesNegatifs: number
   /** Vote de l'utilisateur courant sur ce témoignage, `null` s'il n'a pas voté. */

@@ -33,7 +33,7 @@ func (r *PhotoRepo) ListBySoiree(ctx context.Context, soireeID int64) ([]models.
 	}
 	defer rows.Close()
 
-	var out []models.Photo
+	out := []models.Photo{}
 	for rows.Next() {
 		var p models.Photo
 		if err := rows.Scan(&p.ID, &p.SoireeID, &p.Chemin, &p.CreatedAt); err != nil {

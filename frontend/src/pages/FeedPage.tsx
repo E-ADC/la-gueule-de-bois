@@ -19,7 +19,7 @@ export function FeedPage() {
     setState({ status: 'loading' })
     soireesApi
       .list(controller.signal)
-      .then((soirees) => setState({ status: 'ready', soirees }))
+      .then((soirees) => setState({ status: 'ready', soirees: soirees ?? [] }))
       .catch((err: unknown) => {
         if (controller.signal.aborted) return
         setState({

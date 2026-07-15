@@ -50,7 +50,7 @@ func (r *TemoignageRepo) ListBySoiree(ctx context.Context, soireeID int64) ([]mo
 	}
 	defer rows.Close()
 
-	var out []models.Temoignage
+	out := []models.Temoignage{}
 	for rows.Next() {
 		var t models.Temoignage
 		if err := rows.Scan(&t.ID, &t.SoireeID, &t.AuteurID, &t.Contenu, &t.CreatedAt); err != nil {

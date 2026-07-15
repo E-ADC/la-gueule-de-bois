@@ -129,7 +129,7 @@ func (r *UserRepo) ListLeaderboardForGroup(ctx context.Context, groupeID int64, 
 }
 
 func collectUsers(rows pgx.Rows) ([]models.User, error) {
-	var out []models.User
+	out := []models.User{}
 	for rows.Next() {
 		var u models.User
 		if err := rows.Scan(&u.ID, &u.Pseudo, &u.Email, &u.PasswordHash, &u.Avatar, &u.Bio, &u.Score, &u.Role, &u.CreatedAt); err != nil {

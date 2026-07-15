@@ -24,7 +24,7 @@ func (r *BadgeRepo) ListAll(ctx context.Context) ([]models.Badge, error) {
 	}
 	defer rows.Close()
 
-	var out []models.Badge
+	out := []models.Badge{}
 	for rows.Next() {
 		var b models.Badge
 		if err := rows.Scan(&b.ID, &b.Code, &b.Nom, &b.Description, &b.SeuilScore); err != nil {
@@ -47,7 +47,7 @@ func (r *BadgeRepo) ListForUser(ctx context.Context, userID int64) ([]models.Bad
 	}
 	defer rows.Close()
 
-	var out []models.Badge
+	out := []models.Badge{}
 	for rows.Next() {
 		var b models.Badge
 		if err := rows.Scan(&b.ID, &b.Code, &b.Nom, &b.Description, &b.SeuilScore); err != nil {

@@ -78,7 +78,7 @@ func (r *SoireeRepo) ListByUser(ctx context.Context, userID int64) ([]models.Soi
 	}
 	defer rows.Close()
 
-	var out []models.Soiree
+	out := []models.Soiree{}
 	for rows.Next() {
 		var s models.Soiree
 		if err := rows.Scan(&s.ID, &s.UserID, &s.Titre, &s.DateSoiree, &s.Lieu, &s.Description, &s.CreatedAt, &s.UpdatedAt); err != nil {

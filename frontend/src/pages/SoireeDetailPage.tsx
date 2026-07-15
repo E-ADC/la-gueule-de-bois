@@ -33,7 +33,15 @@ export function SoireeDetailPage() {
       temoignagesApi.listBySoiree(id, controller.signal),
     ])
       .then(([detail, temoignages]) =>
-        setState({ status: 'ready', soiree: detail.soiree, photos: detail.photos, temoignages }),
+        // Filet de sécurité : une liste vide côté API peut arriver en JSON `null`
+        // (slice Go non initialisée) plutôt qu'en `[]` — normalisé ici pour ne
+        // jamais planter le rendu (.length/.map sur null).
+        setState({
+          status: 'ready',
+          soiree: detail.soiree,
+          photos: detail.photos ?? [],
+          temoignages: temoignages ?? [],
+        }),
       )
       .catch((err: unknown) => {
         if (controller.signal.aborted) return

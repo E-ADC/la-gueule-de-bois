@@ -25,7 +25,7 @@ export function ClassementPage() {
     // silencieusement et le sélecteur ne propose que "Global".
     groupesApi
       .listMine(controller.signal)
-      .then(setGroupes)
+      .then((groupes) => setGroupes(groupes ?? []))
       .catch(() => setGroupes([]))
     return () => controller.abort()
   }, [])
@@ -39,7 +39,7 @@ export function ClassementPage() {
         : classementApi.groupe(scope, controller.signal)
 
     fetchEntries
-      .then((entries) => setState({ status: 'ready', entries }))
+      .then((entries) => setState({ status: 'ready', entries: entries ?? [] }))
       .catch((err: unknown) => {
         if (controller.signal.aborted) return
         setState({

@@ -21,7 +21,12 @@ export function ProfilePage() {
     setState({ status: 'loading' })
     badgesApi
       .mine(controller.signal)
-      .then((badges) => setState({ status: 'ready', badges }))
+      .then((badges) =>
+        setState({
+          status: 'ready',
+          badges: { obtenus: badges.obtenus ?? [], tous: badges.tous ?? [] },
+        }),
+      )
       .catch((err: unknown) => {
         if (controller.signal.aborted) return
         setState({

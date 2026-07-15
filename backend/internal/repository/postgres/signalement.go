@@ -67,7 +67,7 @@ func (r *SignalementRepo) ListEnAttente(ctx context.Context) ([]models.Signaleme
 	}
 	defer rows.Close()
 
-	var out []models.Signalement
+	out := []models.Signalement{}
 	for rows.Next() {
 		var s models.Signalement
 		if err := rows.Scan(&s.ID, &s.TemoignageID, &s.AuteurID, &s.Motif, &s.Statut, &s.TraiteParID, &s.CreatedAt, &s.TraiteLe); err != nil {

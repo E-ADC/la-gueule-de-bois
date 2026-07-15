@@ -23,6 +23,7 @@ export function SoireeDetailPage() {
   const [publishError, setPublishError] = useState<string | null>(null)
   const [publishing, setPublishing] = useState(false)
   const [voteMessage, setVoteMessage] = useState<string | null>(null)
+  const [reportMessage, setReportMessage] = useState<string | null>(null)
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteMessage, setInviteMessage] = useState<string | null>(null)
   const [inviting, setInviting] = useState(false)
@@ -112,6 +113,22 @@ export function SoireeDetailPage() {
         setVoteMessage('Tu as déjà voté sur ce témoignage.')
       } else {
         setVoteMessage(err instanceof ApiError ? err.message : 'Le vote a échoué.')
+      }
+    }
+  }
+
+  async function handleSignaler(temoignageId: number) {
+    const motif = window.prompt('Pourquoi signaler ce témoignage ?')
+    if (!motif || !motif.trim()) return
+    setReportMessage(null)
+    try {
+      await temoignagesApi.signaler(temoignageId, motif.trim())
+      setReportMessage('Témoignage signalé, un modérateur va l’examiner (UC13).')
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 409) {
+        setReportMessage('Tu as déjà signalé ce témoignage.')
+      } else {
+        setReportMessage(err instanceof ApiError ? err.message : 'Le signalement a échoué.')
       }
     }
   }
@@ -261,6 +278,7 @@ export function SoireeDetailPage() {
       </form>
 
       {voteMessage && <p className="label vote-message">{voteMessage}</p>}
+      {reportMessage && <p className="label vote-message">{reportMessage}</p>}
 
       {temoignages.length === 0 ? (
         <EmptyState
@@ -293,9 +311,14 @@ export function SoireeDetailPage() {
                 >
                   −1
                 </button>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={() => void handleSignaler(temoignage.id)}
+                >
+                  Signaler
+                </button>
               </div>
-              {/* TODO(UC13) : bouton "signaler" à brancher sur temoignagesApi.signaler
-                  (route encore en 501 côté backend) */}
             </li>
           ))}
         </ul>

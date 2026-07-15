@@ -130,9 +130,13 @@ const (
 
 // Signalement est créé par un utilisateur sur un témoignage jugé
 // inapproprié (UC13), puis traité par un modérateur (UC22).
+//
+// TemoignageID passe à NULL si le témoignage visé est supprimé suite au
+// traitement du signalement : la ligne de signalement doit survivre comme
+// historique de modération (cf. migration 000003).
 type Signalement struct {
 	ID           int64             `json:"id"`
-	TemoignageID int64             `json:"temoignageId"`
+	TemoignageID *int64            `json:"temoignageId,omitempty"`
 	AuteurID     int64             `json:"auteurId"`
 	Motif        string            `json:"motif"`
 	Statut       StatutSignalement `json:"statut"`

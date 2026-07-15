@@ -88,13 +88,20 @@ export type SignalementStatut = 'en_attente' | 'rejete' | 'temoignage_supprime'
 
 export interface Signalement {
   id: number
-  temoignageId: number
+  // `null` une fois le témoignage supprimé par un modérateur (UC22) — le
+  // signalement survit comme historique de modération.
+  temoignageId: number | null
   auteurId: number
   motif: string
   statut: SignalementStatut
   traiteParId?: number
   createdAt: string
   traiteLe?: string
+}
+
+/** Signalement enrichi du contenu du témoignage signalé (GET /signalements, UC22). */
+export interface SignalementView extends Signalement {
+  temoignageContenu: string
 }
 
 /** Format d'erreur uniforme renvoyé par l'API (spec §API — gestion d'erreurs). */

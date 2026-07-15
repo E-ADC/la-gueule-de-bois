@@ -14,7 +14,7 @@ export const temoignagesApi = {
   // Renvoie le Vote créé ; 409 si l'utilisateur a déjà voté sur ce témoignage.
   vote: (temoignageId: number, valeur: VoteValeur) =>
     api.post<Vote>(`/temoignages/${temoignageId}/votes`, { valeur }),
-  // TODO(UC13) : route encore en 501 côté backend.
+  // UC13 : signaler un témoignage (409 si déjà signalé par cet utilisateur).
   signaler: (temoignageId: number, motif: string) =>
     api.post<void>(`/temoignages/${temoignageId}/signalements`, { motif }),
 }

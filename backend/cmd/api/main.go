@@ -52,6 +52,7 @@ func run() error {
 	voteRepo := postgres.NewVoteRepo(pool)
 	badgeRepo := postgres.NewBadgeRepo(pool)
 	groupeRepo := postgres.NewGroupeRepo(pool)
+	signalementRepo := postgres.NewSignalementRepo(pool)
 
 	// Notifier : Resend si une clé API est fournie, sinon mock (dev local
 	// sans dépendance externe, cf. spec).
@@ -70,14 +71,16 @@ func run() error {
 	temoignageService := services.NewTemoignageService(temoignageRepo, temoinInvitationRepo, soireeRepo, userRepo, scoringService, notifier)
 	voteService := services.NewVoteService(voteRepo, temoignageRepo, soireeRepo, scoringService)
 	profileService := services.NewProfileService(userRepo, badgeRepo, groupeRepo)
+	signalementService := services.NewSignalementService(signalementRepo, temoignageRepo, soireeRepo, userRepo, scoringService, notifier)
 
 	router := handlers.NewRouter(handlers.Deps{
-		Auth:        authService,
-		Soirees:     soireeService,
-		Temoignages: temoignageService,
-		Votes:       voteService,
-		Profile:     profileService,
-		UploadDir:   cfg.UploadDir,
+		Auth:         authService,
+		Soirees:      soireeService,
+		Temoignages:  temoignageService,
+		Votes:        voteService,
+		Profile:      profileService,
+		Signalements: signalementService,
+		UploadDir:    cfg.UploadDir,
 	})
 
 	srv := &http.Server{

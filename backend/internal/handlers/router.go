@@ -12,12 +12,13 @@ import (
 // Deps regroupe toutes les dépendances nécessaires au routeur : services
 // métier déjà câblés à leurs repositories (cf. cmd/api/main.go).
 type Deps struct {
-	Auth        *services.AuthService
-	Soirees     *services.SoireeService
-	Temoignages *services.TemoignageService
-	Votes       *services.VoteService
-	Profile     *services.ProfileService
-	UploadDir   string
+	Auth         *services.AuthService
+	Soirees      *services.SoireeService
+	Temoignages  *services.TemoignageService
+	Votes        *services.VoteService
+	Profile      *services.ProfileService
+	Signalements *services.SignalementService
+	UploadDir    string
 }
 
 // NewRouter construit le routeur chi complet de l'API.
@@ -31,6 +32,7 @@ func NewRouter(deps Deps) http.Handler {
 	temoignageH := NewTemoignageHandler(deps.Temoignages)
 	voteH := NewVoteHandler(deps.Votes)
 	profileH := NewProfileHandler(deps.Profile)
+	signalementH := NewSignalementHandler(deps.Signalements, deps.Temoignages)
 
 	requireAuth := RequireAuth(deps.Auth)
 
@@ -79,6 +81,16 @@ func NewRouter(deps Deps) http.Handler {
 		// UC12 — voter (swipe) sur un témoignage.
 		r.With(requireAuth).Post("/temoignages/{id}/votes", voteH.Cast)
 
+		// UC13 — signaler un témoignage.
+		r.With(requireAuth).Post("/temoignages/{id}/signalements", signalementH.Report)
+
+		// UC22 — traiter un signalement (acteur Modérateur uniquement).
+		r.Route("/signalements", func(r chi.Router) {
+			r.Use(requireAuth, RequireModerator)
+			r.Get("/", signalementH.ListEnAttente)
+			r.Post("/{id}/traiter", signalementH.Traiter)
+		})
+
 		registerTODORoutes(r)
 	})
 
@@ -91,20 +103,14 @@ func NewRouter(deps Deps) http.Handler {
 }
 
 // registerTODORoutes documente les cas d'utilisation non couverts par ce
-// squelette (UC13, UC18, UC19, UC21, UC22) : modèles, migrations et
-// repositories sont prêts (cf. internal/repository, internal/models,
+// squelette (UC18, UC19, UC21) : modèles, migrations et repositories sont
+// prêts (cf. internal/repository, internal/models,
 // migrations/000001_init_schema.up.sql), il reste à écrire
 // service+handler sur le même modèle que les routes ci-dessus.
 func registerTODORoutes(r chi.Router) {
 	todo := func(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusNotImplemented, "not_implemented", "Non implémenté dans ce squelette (TODO).")
 	}
-
-	// TODO UC13 — Signaler un témoignage.
-	r.Post("/temoignages/{id}/signalements", todo)
-	// TODO UC22 — Traiter un signalement (acteur Modérateur).
-	r.Get("/signalements", todo)
-	r.Post("/signalements/{id}/traiter", todo)
 
 	// TODO UC18 — Créer un groupe.
 	r.Post("/groupes", todo)

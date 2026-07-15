@@ -125,7 +125,7 @@ export function SoireeFormPage() {
         />
 
         <label className="label" htmlFor="photos">
-          Photos (jpeg, png, webp — 5 Mo max chacune)
+          Photos (jpeg, png, webp — 10 Mo max chacune)
         </label>
         <input
           id="photos"

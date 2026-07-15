@@ -74,3 +74,27 @@ func (r *GroupeRepo) IsMember(ctx context.Context, groupeID, userID int64) (bool
 	).Scan(&exists)
 	return exists, err
 }
+
+// ListForUser liste les groupes dont l'utilisateur est membre.
+func (r *GroupeRepo) ListForUser(ctx context.Context, userID int64) ([]models.Groupe, error) {
+	rows, err := r.pool.Query(ctx, `
+		SELECT g.id, g.nom, g.createur_id, g.created_at
+		FROM groupes g
+		JOIN groupe_membres m ON m.groupe_id = g.id
+		WHERE m.user_id = $1
+		ORDER BY g.nom`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	out := []models.Groupe{}
+	for rows.Next() {
+		var g models.Groupe
+		if err := rows.Scan(&g.ID, &g.Nom, &g.CreateurID, &g.CreatedAt); err != nil {
+			return nil, err
+		}
+		out = append(out, g)
+	}
+	return out, rows.Err()
+}

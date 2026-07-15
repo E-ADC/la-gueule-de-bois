@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"gueuledebois/backend/internal/models"
 	"gueuledebois/backend/internal/services"
 )
 
@@ -12,14 +13,16 @@ import (
 // un témoin, pré-condition de UC11).
 type TemoignageHandler struct {
 	temoignages *services.TemoignageService
+	votes       *services.VoteService
+	profile     *services.ProfileService
 }
 
-func NewTemoignageHandler(temoignages *services.TemoignageService) *TemoignageHandler {
-	return &TemoignageHandler{temoignages: temoignages}
+func NewTemoignageHandler(temoignages *services.TemoignageService, votes *services.VoteService, profile *services.ProfileService) *TemoignageHandler {
+	return &TemoignageHandler{temoignages: temoignages, votes: votes, profile: profile}
 }
 
 type inviteTemoinRequest struct {
-	Email string `json:"email"`
+	Pseudo string `json:"pseudo"`
 }
 
 // InviteTemoin — POST /api/soirees/{id}/temoins (UC09).
@@ -32,12 +35,12 @@ func (h *TemoignageHandler) InviteTemoin(w http.ResponseWriter, r *http.Request)
 	}
 
 	var req inviteTemoinRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || strings.TrimSpace(req.Email) == "" {
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || strings.TrimSpace(req.Pseudo) == "" {
 		mapAndWriteError(w, services.ErrValidation)
 		return
 	}
 
-	if err := h.temoignages.InviteTemoin(r.Context(), user.ID, soireeID, req.Email); err != nil {
+	if err := h.temoignages.InviteTemoin(r.Context(), user.ID, soireeID, req.Pseudo); err != nil {
 		mapAndWriteError(w, err)
 		return
 	}
@@ -71,8 +74,20 @@ func (h *TemoignageHandler) Add(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, t)
 }
 
+// temoignageView enrichit un témoignage du pseudo de son auteur, des
+// compteurs de votes et du vote de l'utilisateur courant, pour un affichage
+// complet sans aller-retours supplémentaires côté frontend.
+type temoignageView struct {
+	models.Temoignage
+	AuteurPseudo  string `json:"auteurPseudo"`
+	VotesPositifs int    `json:"votesPositifs"`
+	VotesNegatifs int    `json:"votesNegatifs"`
+	MonVote       *int   `json:"monVote"`
+}
+
 // ListBySoiree — GET /api/soirees/{id}/temoignages.
 func (h *TemoignageHandler) ListBySoiree(w http.ResponseWriter, r *http.Request) {
+	user := UserFromContext(r.Context())
 	soireeID, err := idFromURL(r, "id")
 	if err != nil {
 		mapAndWriteError(w, services.ErrValidation)
@@ -84,5 +99,23 @@ func (h *TemoignageHandler) ListBySoiree(w http.ResponseWriter, r *http.Request)
 		mapAndWriteError(w, err)
 		return
 	}
-	writeJSON(w, http.StatusOK, list)
+
+	views := make([]temoignageView, 0, len(list))
+	for _, t := range list {
+		view := temoignageView{Temoignage: t}
+		if auteur, err := h.profile.GetPublicProfile(r.Context(), t.AuteurID); err == nil {
+			view.AuteurPseudo = auteur.Pseudo
+		}
+		positifs, negatifs, err := h.votes.Counts(r.Context(), t.ID)
+		if err == nil {
+			view.VotesPositifs = positifs
+			view.VotesNegatifs = negatifs
+		}
+		if monVote, err := h.votes.MonVote(r.Context(), user.ID, t.ID); err == nil && monVote != nil {
+			valeur := int(monVote.Valeur)
+			view.MonVote = &valeur
+		}
+		views = append(views, view)
+	}
+	writeJSON(w, http.StatusOK, views)
 }

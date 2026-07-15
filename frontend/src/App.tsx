@@ -9,6 +9,7 @@ import { FeedPage } from './pages/FeedPage'
 import { SoireeFormPage } from './pages/SoireeFormPage'
 import { SoireeDetailPage } from './pages/SoireeDetailPage'
 import { ClassementPage } from './pages/ClassementPage'
+import { GroupesPage } from './pages/GroupesPage'
 import { ProfilePage } from './pages/ProfilePage'
 import { ModerationPage } from './pages/ModerationPage'
 import { NotFoundPage } from './pages/NotFoundPage'
@@ -41,6 +42,7 @@ export default function App() {
             <Route path="/soirees/:id" element={<SoireeDetailPage />} />
             <Route path="/soirees/:id/modifier" element={<SoireeFormPage />} />
             <Route path="/classement" element={<ClassementPage />} />
+            <Route path="/groupes" element={<GroupesPage />} />
             <Route path="/profil" element={<ProfilePage />} />
             <Route element={<ModeratorRoute />}>
               <Route path="/moderation" element={<ModerationPage />} />

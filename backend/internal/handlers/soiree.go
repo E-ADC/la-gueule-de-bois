@@ -16,8 +16,8 @@ import (
 	"gueuledebois/backend/internal/services"
 )
 
-// maxPhotoSize : 5 Mo, cf. spec "photos minimales".
-const maxPhotoSize = 5 << 20 // 5 Mo
+// maxPhotoSize : 10 Mo.
+const maxPhotoSize = 10 << 20 // 10 Mo
 
 // mimesAutorises : jpeg/png/webp uniquement (spec).
 var mimesAutorises = map[string]string{

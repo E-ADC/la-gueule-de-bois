@@ -11,7 +11,8 @@ services:
     ports:
       # Accès local uniquement (loopback) : pratique pour un tunnel SSH
       # (ssh -L 5433:localhost:5432 ...) sans exposer la base à l'extérieur.
-      - "127.0.0.1:5432:5432"
+      # DB_PORT surchargeable en local si 5432 est déjà pris.
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
     volumes:
       - dbdata:/var/lib/postgresql/data
     healthcheck:

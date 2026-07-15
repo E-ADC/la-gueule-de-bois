@@ -18,6 +18,8 @@ type Deps struct {
 	Votes        *services.VoteService
 	Profile      *services.ProfileService
 	Signalements *services.SignalementService
+	Groupes      *services.GroupeService
+	Amis         *services.DemandeAmiService
 	UploadDir    string
 }
 
@@ -29,10 +31,12 @@ func NewRouter(deps Deps) http.Handler {
 
 	authH := NewAuthHandler(deps.Auth)
 	soireeH := NewSoireeHandler(deps.Soirees, deps.UploadDir)
-	temoignageH := NewTemoignageHandler(deps.Temoignages)
+	temoignageH := NewTemoignageHandler(deps.Temoignages, deps.Votes, deps.Profile)
 	voteH := NewVoteHandler(deps.Votes)
 	profileH := NewProfileHandler(deps.Profile)
 	signalementH := NewSignalementHandler(deps.Signalements, deps.Temoignages)
+	groupeH := NewGroupeHandler(deps.Groupes)
+	amiH := NewDemandeAmiHandler(deps.Amis)
 
 	requireAuth := RequireAuth(deps.Auth)
 
@@ -60,6 +64,22 @@ func NewRouter(deps Deps) http.Handler {
 
 		// UC15 — mes badges.
 		r.With(requireAuth).Get("/me/badges", profileH.ListMyBadges)
+		// UC04 — modifier son profil.
+		r.With(requireAuth).Put("/me", profileH.UpdateProfile)
+
+		// UC18 — créer un groupe ; liste de mes groupes.
+		r.With(requireAuth).Post("/groupes", groupeH.Create)
+		r.With(requireAuth).Get("/groupes", groupeH.ListMine)
+		// UC19 — rejoindre un groupe.
+		r.With(requireAuth).Post("/groupes/{id}/membres", groupeH.Join)
+
+		// UC21 — envoyer une demande d'ami, lister les demandes reçues, y répondre.
+		r.Route("/amis/demandes", func(r chi.Router) {
+			r.Use(requireAuth)
+			r.Post("/", amiH.Envoyer)
+			r.Get("/", amiH.ListRecues)
+			r.Post("/{id}/repondre", amiH.Repondre)
+		})
 
 		// UC06/07/08/10 — CRUD soirées + historique + photos.
 		r.Route("/soirees", func(r chi.Router) {
@@ -90,8 +110,6 @@ func NewRouter(deps Deps) http.Handler {
 			r.Get("/", signalementH.ListEnAttente)
 			r.Post("/{id}/traiter", signalementH.Traiter)
 		})
-
-		registerTODORoutes(r)
 	})
 
 	// Photos servies en statique en local (en prod, nginx s'en charge — cf.
@@ -100,23 +118,4 @@ func NewRouter(deps Deps) http.Handler {
 	r.Handle("/uploads/*", http.StripPrefix("/uploads/", fileServer))
 
 	return r
-}
-
-// registerTODORoutes documente les cas d'utilisation non couverts par ce
-// squelette (UC18, UC19, UC21) : modèles, migrations et repositories sont
-// prêts (cf. internal/repository, internal/models,
-// migrations/000001_init_schema.up.sql), il reste à écrire
-// service+handler sur le même modèle que les routes ci-dessus.
-func registerTODORoutes(r chi.Router) {
-	todo := func(w http.ResponseWriter, r *http.Request) {
-		writeError(w, http.StatusNotImplemented, "not_implemented", "Non implémenté dans ce squelette (TODO).")
-	}
-
-	// TODO UC18 — Créer un groupe.
-	r.Post("/groupes", todo)
-	// TODO UC19 — Rejoindre un groupe.
-	r.Post("/groupes/{id}/membres", todo)
-
-	// TODO UC21 — Envoyer une demande d'ami.
-	r.Post("/amis/demandes", todo)
 }

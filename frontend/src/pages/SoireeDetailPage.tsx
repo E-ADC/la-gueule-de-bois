@@ -291,17 +291,19 @@ export function SoireeDetailPage() {
           {temoignages.map((temoignage) => (
             <li key={temoignage.id} className="card temoignage-card">
               <div className="temoignage-header">
-                <span className="avatar">
+                <Link to={`/utilisateurs/${temoignage.auteurId}`} className="avatar" aria-label={`Profil de ${temoignage.auteurPseudo}`}>
                   {temoignage.auteurAvatar ? (
                     <img src={temoignage.auteurAvatar} alt={temoignage.auteurPseudo} />
                   ) : (
                     temoignage.auteurPseudo.slice(0, 2).toUpperCase()
                   )}
-                </span>
+                </Link>
                 <div>
                   <p className="card-meta">
-                    <strong>{temoignage.auteurPseudo}</strong> ·{' '}
-                    {new Date(temoignage.createdAt).toLocaleDateString('fr-FR')}
+                    <Link to={`/utilisateurs/${temoignage.auteurId}`}>
+                      <strong>{temoignage.auteurPseudo}</strong>
+                    </Link>{' '}
+                    · {new Date(temoignage.createdAt).toLocaleDateString('fr-FR')}
                   </p>
                 </div>
               </div>

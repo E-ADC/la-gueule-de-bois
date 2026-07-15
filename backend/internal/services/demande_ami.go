@@ -85,3 +85,8 @@ func (s *DemandeAmiService) Repondre(ctx context.Context, userID, demandeID int6
 	}
 	return s.demandes.MarkStatut(ctx, demandeID, statut)
 }
+
+// ListAmis liste les amis de l'utilisateur (demandes acceptées).
+func (s *DemandeAmiService) ListAmis(ctx context.Context, userID int64) ([]models.User, error) {
+	return s.demandes.ListAmis(ctx, userID)
+}

@@ -102,13 +102,6 @@ export function ProfilePage() {
     return <Loading label="Chargement du profil…" />
   }
 
-  // GET /me/badges renvoie { obtenus: Badge[], tous: Badge[] } :
-  // l'état "obtenu / à débloquer" se reconstruit en croisant les deux listes.
-  const obtenusIds =
-    state.status === 'ready'
-      ? new Set(state.badges.obtenus.map((badge) => badge.id))
-      : new Set<number>()
-
   return (
     <div className="page">
       <div className="card profile-card">
@@ -179,21 +172,18 @@ export function ProfilePage() {
         <ErrorState message={state.message} onRetry={() => setReloadToken((t) => t + 1)} />
       )}
 
-      {state.status === 'ready' && state.badges.tous.length === 0 && (
+      {state.status === 'ready' && state.badges.obtenus.length === 0 && (
         <EmptyState
           title="Aucun badge"
-          message="Aucun badge à afficher pour l’instant (débloqués automatiquement via le scoring, UC14)."
+          message="Aucun badge débloqué pour l’instant (débloqués automatiquement via le scoring, UC14)."
         />
       )}
 
-      {state.status === 'ready' && state.badges.tous.length > 0 && (
+      {state.status === 'ready' && state.badges.obtenus.length > 0 && (
         <ul className="badge-list">
-          {state.badges.tous.map((badge) => (
+          {state.badges.obtenus.map((badge) => (
             <li key={badge.id}>
-              <span
-                className={obtenusIds.has(badge.id) ? 'badge' : 'badge badge-locked'}
-                title={`${badge.description} (seuil : ${badge.seuilScore} pts)`}
-              >
+              <span className="badge" title={badge.description}>
                 {badgeIconByCode(badge.code)}
                 {badge.nom}
               </span>

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"gueuledebois/backend/internal/services"
@@ -16,7 +17,9 @@ func NewProfileHandler(profile *services.ProfileService) *ProfileHandler {
 	return &ProfileHandler{profile: profile}
 }
 
-// GetPublicProfile — GET /api/users/{id} (UC05).
+// GetPublicProfile — GET /api/users/{id} (UC05 : "score, badges, historique
+// visible" — historique des soirées volontairement omis ici, déjà consultable
+// via son propre historique UC10, la fiche ne précise pas de vue dédiée).
 func (h *ProfileHandler) GetPublicProfile(w http.ResponseWriter, r *http.Request) {
 	id, err := idFromURL(r, "id")
 	if err != nil {
@@ -28,7 +31,39 @@ func (h *ProfileHandler) GetPublicProfile(w http.ResponseWriter, r *http.Request
 		mapAndWriteError(w, err)
 		return
 	}
-	writeJSON(w, http.StatusOK, user)
+	badges, err := h.profile.ListBadges(r.Context(), id)
+	if err != nil {
+		mapAndWriteError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"user": user, "badges": badges})
+}
+
+type updateProfileRequest struct {
+	Pseudo string `json:"pseudo"`
+	Avatar string `json:"avatar"`
+	Bio    string `json:"bio"`
+}
+
+// UpdateProfile — PUT /api/me (UC04).
+func (h *ProfileHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
+	user := UserFromContext(r.Context())
+	var req updateProfileRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		mapAndWriteError(w, services.ErrValidation)
+		return
+	}
+
+	updated, err := h.profile.UpdateProfile(r.Context(), user.ID, services.UpdateProfileInput{
+		Pseudo: req.Pseudo,
+		Avatar: req.Avatar,
+		Bio:    req.Bio,
+	})
+	if err != nil {
+		mapAndWriteError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, updated)
 }
 
 // ListMyBadges — GET /api/me/badges (UC15).

@@ -55,3 +55,22 @@ func (s *VoteService) Cast(ctx context.Context, userID, temoignageID int64, vale
 
 	return v, nil
 }
+
+// Counts renvoie les compteurs de votes positifs/négatifs d'un témoignage,
+// pour l'affichage enrichi (SoireeDetailPage).
+func (s *VoteService) Counts(ctx context.Context, temoignageID int64) (positifs int, negatifs int, err error) {
+	return s.votes.CountForTemoignage(ctx, temoignageID)
+}
+
+// MonVote renvoie le vote de cet utilisateur sur ce témoignage (nil s'il
+// n'a pas encore voté).
+func (s *VoteService) MonVote(ctx context.Context, userID, temoignageID int64) (*models.Vote, error) {
+	v, err := s.votes.GetByUserAndTemoignage(ctx, userID, temoignageID)
+	if err != nil {
+		if err == repository.ErrNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return v, nil
+}

@@ -23,6 +23,12 @@ export function Layout() {
               <NavLink to="/classement" className={navClass}>
                 Classement
               </NavLink>
+              <NavLink to="/groupes" className={navClass}>
+                Groupes
+              </NavLink>
+              <NavLink to="/amis" className={navClass}>
+                Amis
+              </NavLink>
               <NavLink to="/profil" className={navClass}>
                 Profil
               </NavLink>

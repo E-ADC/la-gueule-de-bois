@@ -42,15 +42,17 @@ export interface SoireeDetail {
   photos: Photo[]
 }
 
-// TODO(backend) : DTO enrichi (pseudo de l'auteur, compteurs de votes,
-// vote de l'utilisateur courant) — en attendant, le front affiche les
-// témoignages sans compteurs.
 export interface Temoignage {
   id: number
   soireeId: number
   auteurId: number
   contenu: string
   createdAt: string
+  auteurPseudo: string
+  votesPositifs: number
+  votesNegatifs: number
+  /** Vote de l'utilisateur courant sur ce témoignage, `null` s'il n'a pas voté. */
+  monVote: VoteValeur | null
 }
 
 export type VoteValeur = 1 | -1
@@ -81,6 +83,23 @@ export interface Groupe {
   id: number
   nom: string
   createurId: number
+  createdAt: string
+}
+
+/** Enveloppe renvoyée par GET /api/users/{id} (UC05). */
+export interface PublicProfile {
+  user: User
+  badges: Badge[]
+}
+
+export type StatutDemandeAmi = 'en_attente' | 'acceptee' | 'refusee'
+
+/** Demande d'ami (UC21). */
+export interface DemandeAmi {
+  id: number
+  demandeurId: number
+  destinataireId: number
+  statut: StatutDemandeAmi
   createdAt: string
 }
 

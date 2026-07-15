@@ -9,23 +9,20 @@ import { FeedPage } from './pages/FeedPage'
 import { SoireeFormPage } from './pages/SoireeFormPage'
 import { SoireeDetailPage } from './pages/SoireeDetailPage'
 import { ClassementPage } from './pages/ClassementPage'
+import { GroupesPage } from './pages/GroupesPage'
+import { AmisPage } from './pages/AmisPage'
 import { ProfilePage } from './pages/ProfilePage'
+import { PublicProfilePage } from './pages/PublicProfilePage'
 import { ModerationPage } from './pages/ModerationPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 
 /**
- * Écrans couverts par ce squelette : UC01/02/03 (auth), UC06/07/08/10 (soirées,
- * y compris upload photo), UC09/11/12/13 (témoignages, votes, invitation de
- * témoin, signalement), UC17/20 (classement), UC04 (lecture profil)/UC15/16
- * (badges + score), UC22 (modération, rôle Modérateur).
+ * Écrans couverts : UC01/02/03 (auth), UC04/05 (profil, édition et public),
+ * UC06/07/08/10 (soirées, upload photo), UC09/11/12/13 (témoignages, votes,
+ * invitation de témoin, signalement), UC15/16 (badges + score), UC17/20
+ * (classement), UC18/19 (groupes), UC21 (amis), UC22 (modération).
  *
- * TODO — cas d'utilisation pas encore couverts par une page (client API prêt
- * dans src/api/ quand ce sera le cas) :
- *   - UC04 (édition du profil)      → formulaire dans ProfilePage
- *   - UC05 (profil public d'un tiers) → route /utilisateurs/:id
- *   - UC18/19 (créer/rejoindre un groupe) → page Groupes (groupesApi prêt)
- *   - UC21 (demande d'ami)          → page/section Amis
- *   - UC12 (swipe) volontairement absent de ce lot (cf. consigne)
+ * UC12 (swipe) volontairement absent (cf. consigne).
  */
 export default function App() {
   return (
@@ -41,7 +38,10 @@ export default function App() {
             <Route path="/soirees/:id" element={<SoireeDetailPage />} />
             <Route path="/soirees/:id/modifier" element={<SoireeFormPage />} />
             <Route path="/classement" element={<ClassementPage />} />
+            <Route path="/groupes" element={<GroupesPage />} />
+            <Route path="/amis" element={<AmisPage />} />
             <Route path="/profil" element={<ProfilePage />} />
+            <Route path="/utilisateurs/:id" element={<PublicProfilePage />} />
             <Route element={<ModeratorRoute />}>
               <Route path="/moderation" element={<ModerationPage />} />
             </Route>

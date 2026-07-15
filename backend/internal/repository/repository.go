@@ -118,6 +118,9 @@ type DemandeAmiRepository interface {
 	ExisteEntre(ctx context.Context, userAID, userBID int64, statuts []models.StatutDemandeAmi) (bool, error)
 	ListRecues(ctx context.Context, destinataireID int64) ([]models.DemandeAmi, error)
 	MarkStatut(ctx context.Context, id int64, statut models.StatutDemandeAmi) error
+	// ListAmis liste les utilisateurs avec lesquels une demande a été
+	// acceptée (dans un sens ou l'autre).
+	ListAmis(ctx context.Context, userID int64) ([]models.User, error)
 }
 
 // SignalementRepository gère les signalements de témoignages (UC13/UC22).

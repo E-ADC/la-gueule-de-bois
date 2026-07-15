@@ -4,13 +4,18 @@ import { Link } from 'react-router-dom'
 import { amisApi } from '../api/amis'
 import { usersApi } from '../api/users'
 import { ApiError } from '../api/client'
-import type { DemandeAmi } from '../api/types'
+import type { DemandeAmi, User } from '../api/types'
 import { Loading, ErrorState, EmptyState } from '../components/StateViews'
 
 type LoadState =
   | { status: 'loading' }
   | { status: 'error'; message: string }
   | { status: 'ready'; demandes: DemandeAmi[] }
+
+type AmisListState =
+  | { status: 'loading' }
+  | { status: 'error'; message: string }
+  | { status: 'ready'; amis: User[] }
 
 interface DemandeAffichee extends DemandeAmi {
   demandeurPseudo?: string
@@ -27,6 +32,24 @@ export function AmisPage() {
   const [sending, setSending] = useState(false)
   const [demandesAffichees, setDemandesAffichees] = useState<DemandeAffichee[]>([])
   const [resolvingPseudos, setResolvingPseudos] = useState(false)
+  const [amisState, setAmisState] = useState<AmisListState>({ status: 'loading' })
+
+  // Chargement de la liste d'amis (demandes acceptées)
+  useEffect(() => {
+    const controller = new AbortController()
+    setAmisState({ status: 'loading' })
+    amisApi
+      .listAmis(controller.signal)
+      .then((amis) => setAmisState({ status: 'ready', amis: amis ?? [] }))
+      .catch((err: unknown) => {
+        if (controller.signal.aborted) return
+        setAmisState({
+          status: 'error',
+          message: err instanceof ApiError ? err.message : 'Impossible de charger tes amis.',
+        })
+      })
+    return () => controller.abort()
+  }, [reloadToken])
 
   // Chargement des demandes reçues
   useEffect(() => {
@@ -114,6 +137,32 @@ export function AmisPage() {
       <div className="page-header">
         <h1>Amis</h1>
       </div>
+
+      <h2>Mes amis</h2>
+
+      {amisState.status === 'loading' && <Loading label="Chargement de tes amis…" />}
+
+      {amisState.status === 'error' && (
+        <ErrorState message={amisState.message} onRetry={() => setReloadToken((t) => t + 1)} />
+      )}
+
+      {amisState.status === 'ready' && amisState.amis.length === 0 && (
+        <EmptyState title="Aucun ami" message="Tu n'as pas encore d'ami — envoie une demande ci-dessous." />
+      )}
+
+      {amisState.status === 'ready' && amisState.amis.length > 0 && (
+        <div className="card">
+          {amisState.amis.map((ami) => (
+            <Link key={ami.id} to={`/utilisateurs/${ami.id}`} className="rank-row">
+              <span className="avatar">{ami.pseudo.slice(0, 2).toUpperCase()}</span>
+              <span>{ami.pseudo}</span>
+              <span className="pts">{ami.score} pts</span>
+            </Link>
+          ))}
+        </div>
+      )}
+
+      <hr className="sep" />
 
       <h2>Envoyer une demande d\'ami</h2>
       <form className="card" onSubmit={(event) => void handleSendRequest(event)}>

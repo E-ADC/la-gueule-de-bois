@@ -269,6 +269,15 @@
   opacity: 0.7;
 }
 
+/* .rank-row utilisé comme lien cliquable (liste d'amis) */
+a.rank-row {
+  text-decoration: none;
+  color: inherit;
+}
+a.rank-row:hover {
+  background: var(--malt);
+}
+
 .vote-message {
   margin: 14px 0 0;
 }

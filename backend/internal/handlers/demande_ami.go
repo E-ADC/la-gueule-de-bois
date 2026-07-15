@@ -85,3 +85,14 @@ func (h *DemandeAmiHandler) Repondre(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusNoContent)
 }
+
+// ListAmis — GET /api/amis : liste des amis (demandes acceptées).
+func (h *DemandeAmiHandler) ListAmis(w http.ResponseWriter, r *http.Request) {
+	user := UserFromContext(r.Context())
+	list, err := h.demandes.ListAmis(r.Context(), user.ID)
+	if err != nil {
+		mapAndWriteError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, list)
+}

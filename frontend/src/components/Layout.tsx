@@ -26,6 +26,11 @@ export function Layout() {
               <NavLink to="/profil" className={navClass}>
                 Profil
               </NavLink>
+              {user.role === 'moderator' && (
+                <NavLink to="/moderation" className={navClass}>
+                  Modération
+                </NavLink>
+              )}
             </nav>
           )}
           <div className="header-actions">

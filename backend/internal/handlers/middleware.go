@@ -41,3 +41,16 @@ func UserFromContext(ctx context.Context) *models.User {
 	u, _ := ctx.Value(userCtxKey).(*models.User)
 	return u
 }
+
+// RequireModerator restreint l'accès aux utilisateurs de rôle "moderator"
+// (UC22, acteur Modérateur). Doit être chaîné après RequireAuth.
+func RequireModerator(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user := UserFromContext(r.Context())
+		if user == nil || user.Role != "moderator" {
+			writeError(w, http.StatusForbidden, "forbidden", "Action réservée aux modérateurs.")
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}

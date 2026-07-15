@@ -81,6 +81,10 @@ type VoteRepository interface {
 	Create(ctx context.Context, v *models.Vote) error
 	Exists(ctx context.Context, temoignageID, userID int64) (bool, error)
 	SommeVotesForOwner(ctx context.Context, ownerID int64) (positifs int, negatifs int, err error)
+	// CountForTemoignage et GetByUserAndTemoignage alimentent l'affichage
+	// enrichi des témoignages (compteurs de votes, "mon vote").
+	CountForTemoignage(ctx context.Context, temoignageID int64) (positifs int, negatifs int, err error)
+	GetByUserAndTemoignage(ctx context.Context, userID, temoignageID int64) (*models.Vote, error)
 }
 
 // BadgeRepository gère le catalogue de badges et leur attribution (UC14/UC15).
@@ -97,6 +101,19 @@ type GroupeRepository interface {
 	GetByNom(ctx context.Context, nom string) (*models.Groupe, error)
 	AddMember(ctx context.Context, groupeID, userID int64) error
 	IsMember(ctx context.Context, groupeID, userID int64) (bool, error)
+	// ListForUser liste les groupes dont l'utilisateur est membre.
+	ListForUser(ctx context.Context, userID int64) ([]models.Groupe, error)
+}
+
+// DemandeAmiRepository gère les demandes d'ami (UC21).
+type DemandeAmiRepository interface {
+	Create(ctx context.Context, d *models.DemandeAmi) error
+	GetByID(ctx context.Context, id int64) (*models.DemandeAmi, error)
+	// ExisteEntre indique si une demande (peu importe le sens) existe déjà
+	// entre ces deux utilisateurs avec l'un des statuts donnés.
+	ExisteEntre(ctx context.Context, userAID, userBID int64, statuts []models.StatutDemandeAmi) (bool, error)
+	ListRecues(ctx context.Context, destinataireID int64) ([]models.DemandeAmi, error)
+	MarkStatut(ctx context.Context, id int64, statut models.StatutDemandeAmi) error
 }
 
 // SignalementRepository gère les signalements de témoignages (UC13/UC22).

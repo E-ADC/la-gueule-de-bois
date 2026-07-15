@@ -111,6 +111,12 @@ func (f *fakeVoteRepo) Exists(ctx context.Context, temoignageID, userID int64) (
 func (f *fakeVoteRepo) SommeVotesForOwner(ctx context.Context, ownerID int64) (int, int, error) {
 	return f.positifs[ownerID], f.negatifs[ownerID], nil
 }
+func (f *fakeVoteRepo) CountForTemoignage(ctx context.Context, temoignageID int64) (int, int, error) {
+	return 0, 0, nil
+}
+func (f *fakeVoteRepo) GetByUserAndTemoignage(ctx context.Context, userID, temoignageID int64) (*models.Vote, error) {
+	return nil, repository.ErrNotFound
+}
 
 type fakeBadgeRepo struct {
 	catalogue []models.Badge

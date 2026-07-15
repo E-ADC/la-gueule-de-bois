@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"strings"
 
 	"gueuledebois/backend/internal/models"
 	"gueuledebois/backend/internal/repository"
@@ -23,6 +24,32 @@ func NewProfileService(users repository.UserRepository, badges repository.BadgeR
 // GetPublicProfile implémente UC05.
 func (s *ProfileService) GetPublicProfile(ctx context.Context, userID int64) (*models.User, error) {
 	return s.users.GetByID(ctx, userID)
+}
+
+// UpdateProfileInput regroupe les champs modifiables d'un profil (UC04).
+type UpdateProfileInput struct {
+	Pseudo string
+	Avatar string
+	Bio    string
+}
+
+// UpdateProfile implémente UC04 : "pseudo déjà pris -> modification refusée"
+// remonte via repository.ErrConflict (contrainte unique sur users.pseudo).
+func (s *ProfileService) UpdateProfile(ctx context.Context, userID int64, in UpdateProfileInput) (*models.User, error) {
+	if strings.TrimSpace(in.Pseudo) == "" {
+		return nil, ErrValidation
+	}
+	user, err := s.users.GetByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	user.Pseudo = in.Pseudo
+	user.Avatar = in.Avatar
+	user.Bio = in.Bio
+	if err := s.users.Update(ctx, user); err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 // ListBadges implémente UC15.

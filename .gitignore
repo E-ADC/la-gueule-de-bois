@@ -11,3 +11,4 @@ backend/uploads/
 
 # Divers
 *.log
+.claude/worktrees/

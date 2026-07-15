@@ -24,7 +24,7 @@ export function SoireeDetailPage() {
   const [publishing, setPublishing] = useState(false)
   const [voteMessage, setVoteMessage] = useState<string | null>(null)
   const [reportMessage, setReportMessage] = useState<string | null>(null)
-  const [inviteEmail, setInviteEmail] = useState('')
+  const [invitePseudo, setInvitePseudo] = useState('')
   const [inviteMessage, setInviteMessage] = useState<string | null>(null)
   const [inviting, setInviting] = useState(false)
   const [lightboxPhoto, setLightboxPhoto] = useState<Photo | null>(null)
@@ -107,7 +107,7 @@ export function SoireeDetailPage() {
     setVoteMessage(null)
     try {
       await temoignagesApi.vote(temoignageId, valeur)
-      setVoteMessage('Vote enregistré.')
+      setReloadToken((token) => token + 1)
     } catch (err) {
       if (err instanceof ApiError && err.status === 409) {
         setVoteMessage('Tu as déjà voté sur ce témoignage.')
@@ -135,16 +135,16 @@ export function SoireeDetailPage() {
 
   async function handleInvite(event: FormEvent) {
     event.preventDefault()
-    if (!id || !inviteEmail.trim()) return
+    if (!id || !invitePseudo.trim()) return
     setInviteMessage(null)
     setInviting(true)
     try {
-      await temoignagesApi.inviteTemoin(id, inviteEmail.trim())
-      setInviteMessage(`${inviteEmail.trim()} a été invité comme témoin.`)
-      setInviteEmail('')
+      await temoignagesApi.inviteTemoin(id, invitePseudo.trim())
+      setInviteMessage(`${invitePseudo.trim()} a été invité comme témoin.`)
+      setInvitePseudo('')
     } catch (err) {
       if (err instanceof ApiError && err.status === 404) {
-        setInviteMessage("Aucun compte n'existe avec cet email.")
+        setInviteMessage("Aucun compte n'existe avec ce pseudo.")
       } else if (err instanceof ApiError && err.status === 409) {
         setInviteMessage('Cette personne est déjà invitée comme témoin.')
       } else {
@@ -235,16 +235,16 @@ export function SoireeDetailPage() {
           <hr className="sep" />
           <h2>Inviter un témoin</h2>
           <form className="card" onSubmit={(event) => void handleInvite(event)}>
-            <label className="label" htmlFor="invite-email">
-              Email de la personne à inviter (UC09)
+            <label className="label" htmlFor="invite-pseudo">
+              Pseudo de la personne à inviter (UC09)
             </label>
             <input
-              id="invite-email"
-              type="email"
+              id="invite-pseudo"
+              type="text"
               className="input"
-              value={inviteEmail}
-              onChange={(event) => setInviteEmail(event.target.value)}
-              placeholder="ami@example.fr"
+              value={invitePseudo}
+              onChange={(event) => setInvitePseudo(event.target.value)}
+              placeholder="pseudo"
               required
             />
             {inviteMessage && <p className="label vote-message">{inviteMessage}</p>}
@@ -287,30 +287,37 @@ export function SoireeDetailPage() {
         />
       ) : (
         <ul className="temoignage-list">
-          {/* TODO(backend) : DTO enrichi côté backend (pseudo de l'auteur,
-              compteurs de votes, vote de l'utilisateur courant) — en attendant,
-              affichage sans compteurs ni état "déjà voté". */}
           {temoignages.map((temoignage) => (
             <li key={temoignage.id} className="card temoignage-card">
               <p className="card-meta">
+                {temoignage.auteurPseudo} ·{' '}
                 {new Date(temoignage.createdAt).toLocaleDateString('fr-FR')}
               </p>
               <p>{temoignage.contenu}</p>
               <div className="vote-row">
-                <button
-                  type="button"
-                  className="btn btn-ghost"
-                  onClick={() => void handleVote(temoignage.id, 1)}
-                >
-                  +1
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-ghost"
-                  onClick={() => void handleVote(temoignage.id, -1)}
-                >
-                  −1
-                </button>
+                {temoignage.monVote !== null ? (
+                  <span className="label">
+                    Tu as voté {temoignage.monVote === 1 ? '+1' : '−1'} · {temoignage.votesPositifs}{' '}
+                    positif(s), {temoignage.votesNegatifs} négatif(s)
+                  </span>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className="btn btn-ghost"
+                      onClick={() => void handleVote(temoignage.id, 1)}
+                    >
+                      +1 ({temoignage.votesPositifs})
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-ghost"
+                      onClick={() => void handleVote(temoignage.id, -1)}
+                    >
+                      −1 ({temoignage.votesNegatifs})
+                    </button>
+                  </>
+                )}
                 <button
                   type="button"
                   className="btn btn-ghost"

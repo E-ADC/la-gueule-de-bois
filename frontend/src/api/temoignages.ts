@@ -8,9 +8,9 @@ export const temoignagesApi = {
     api.get<Temoignage[]>(`/soirees/${soireeId}/temoignages`, signal),
   create: (soireeId: number | string, contenu: string) =>
     api.post<Temoignage>(`/soirees/${soireeId}/temoignages`, { contenu }),
-  // TODO(UC09) : pas encore d'UI, client prêt (POST /soirees/{id}/temoins).
-  inviteTemoin: (soireeId: number | string, inviteId: number) =>
-    api.post<void>(`/soirees/${soireeId}/temoins`, { inviteId }),
+  // UC09 : invite par email (l'invité doit déjà avoir un compte).
+  inviteTemoin: (soireeId: number | string, email: string) =>
+    api.post<void>(`/soirees/${soireeId}/temoins`, { email }),
   // Renvoie le Vote créé ; 409 si l'utilisateur a déjà voté sur ce témoignage.
   vote: (temoignageId: number, valeur: VoteValeur) =>
     api.post<Vote>(`/temoignages/${temoignageId}/votes`, { valeur }),

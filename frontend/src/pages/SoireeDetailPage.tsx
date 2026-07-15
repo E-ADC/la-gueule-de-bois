@@ -23,6 +23,10 @@ export function SoireeDetailPage() {
   const [publishError, setPublishError] = useState<string | null>(null)
   const [publishing, setPublishing] = useState(false)
   const [voteMessage, setVoteMessage] = useState<string | null>(null)
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [inviteMessage, setInviteMessage] = useState<string | null>(null)
+  const [inviting, setInviting] = useState(false)
+  const [lightboxPhoto, setLightboxPhoto] = useState<Photo | null>(null)
 
   useEffect(() => {
     if (!id) return
@@ -53,6 +57,16 @@ export function SoireeDetailPage() {
     return () => controller.abort()
   }, [id, reloadToken])
 
+  // Ferme la visionneuse plein écran avec Échap.
+  useEffect(() => {
+    if (!lightboxPhoto) return
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setLightboxPhoto(null)
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [lightboxPhoto])
+
   async function handleDelete() {
     if (!id) return
     if (!window.confirm('Supprimer définitivement cette soirée ?')) return
@@ -74,9 +88,15 @@ export function SoireeDetailPage() {
       setNouveauTemoignage('')
       setReloadToken((token) => token + 1)
     } catch (err) {
-      setPublishError(
-        err instanceof ApiError ? err.message : 'La publication du témoignage a échoué.',
-      )
+      if (err instanceof ApiError && err.status === 403) {
+        setPublishError(
+          "Tu dois être invité comme témoin par l'auteur de cette soirée pour pouvoir témoigner (UC09/UC11).",
+        )
+      } else {
+        setPublishError(
+          err instanceof ApiError ? err.message : 'La publication du témoignage a échoué.',
+        )
+      }
     } finally {
       setPublishing(false)
     }
@@ -93,6 +113,28 @@ export function SoireeDetailPage() {
       } else {
         setVoteMessage(err instanceof ApiError ? err.message : 'Le vote a échoué.')
       }
+    }
+  }
+
+  async function handleInvite(event: FormEvent) {
+    event.preventDefault()
+    if (!id || !inviteEmail.trim()) return
+    setInviteMessage(null)
+    setInviting(true)
+    try {
+      await temoignagesApi.inviteTemoin(id, inviteEmail.trim())
+      setInviteMessage(`${inviteEmail.trim()} a été invité comme témoin.`)
+      setInviteEmail('')
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 404) {
+        setInviteMessage("Aucun compte n'existe avec cet email.")
+      } else if (err instanceof ApiError && err.status === 409) {
+        setInviteMessage('Cette personne est déjà invitée comme témoin.')
+      } else {
+        setInviteMessage(err instanceof ApiError ? err.message : "L'invitation a échoué.")
+      }
+    } finally {
+      setInviting(false)
     }
   }
 
@@ -134,10 +176,66 @@ export function SoireeDetailPage() {
         <ul className="photo-preview-list">
           {photos.map((photo) => (
             <li key={photo.id}>
-              <img src={photo.path} alt={`Photo de ${soiree.titre}`} />
+              <button
+                type="button"
+                className="photo-preview-button"
+                onClick={() => setLightboxPhoto(photo)}
+                aria-label="Agrandir la photo"
+              >
+                <img src={photo.path} alt={`Photo de ${soiree.titre}`} />
+              </button>
             </li>
           ))}
         </ul>
+      )}
+
+      {lightboxPhoto && (
+        <div
+          className="lightbox-overlay"
+          onClick={() => setLightboxPhoto(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Photo en plein écran"
+        >
+          <img
+            src={lightboxPhoto.path}
+            alt={`Photo de ${soiree.titre} en plein écran`}
+            className="lightbox-image"
+          />
+          <button
+            type="button"
+            className="lightbox-close"
+            onClick={() => setLightboxPhoto(null)}
+            aria-label="Fermer"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {estAuteur && (
+        <>
+          <hr className="sep" />
+          <h2>Inviter un témoin</h2>
+          <form className="card" onSubmit={(event) => void handleInvite(event)}>
+            <label className="label" htmlFor="invite-email">
+              Email de la personne à inviter (UC09)
+            </label>
+            <input
+              id="invite-email"
+              type="email"
+              className="input"
+              value={inviteEmail}
+              onChange={(event) => setInviteEmail(event.target.value)}
+              placeholder="ami@example.fr"
+              required
+            />
+            {inviteMessage && <p className="label vote-message">{inviteMessage}</p>}
+            <button type="submit" className="btn btn-primary" disabled={inviting}>
+              {inviting ? 'Invitation…' : 'Inviter'}
+            </button>
+          </form>
+        </>
       )}
 
       <hr className="sep" />

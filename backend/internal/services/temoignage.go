@@ -38,8 +38,9 @@ func NewTemoignageService(
 }
 
 // InviteTemoin implémente UC09 : seul le propriétaire de la soirée peut
-// inviter, l'invité doit exister. Notifie l'invité par email (Resend).
-func (s *TemoignageService) InviteTemoin(ctx context.Context, ownerID, soireeID, inviteID int64) error {
+// inviter, l'invité doit exister (recherché par email). Notifie l'invité
+// par email (Resend).
+func (s *TemoignageService) InviteTemoin(ctx context.Context, ownerID, soireeID int64, inviteEmail string) error {
 	soiree, err := s.soirees.GetByID(ctx, soireeID)
 	if err != nil {
 		return err
@@ -48,13 +49,13 @@ func (s *TemoignageService) InviteTemoin(ctx context.Context, ownerID, soireeID,
 		return ErrForbidden
 	}
 
-	invite, err := s.users.GetByID(ctx, inviteID)
+	invite, err := s.users.GetByEmail(ctx, inviteEmail)
 	if err != nil {
 		// "Utilisateur invité inexistant -> invitation refusée"
 		return err
 	}
 
-	if err := s.invitations.Create(ctx, &models.TemoinInvitation{SoireeID: soireeID, InviteID: inviteID}); err != nil {
+	if err := s.invitations.Create(ctx, &models.TemoinInvitation{SoireeID: soireeID, InviteID: invite.ID}); err != nil {
 		return err
 	}
 

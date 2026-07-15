@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"gueuledebois/backend/internal/services"
 )
@@ -18,7 +19,7 @@ func NewTemoignageHandler(temoignages *services.TemoignageService) *TemoignageHa
 }
 
 type inviteTemoinRequest struct {
-	InviteID int64 `json:"inviteId"`
+	Email string `json:"email"`
 }
 
 // InviteTemoin — POST /api/soirees/{id}/temoins (UC09).
@@ -31,12 +32,12 @@ func (h *TemoignageHandler) InviteTemoin(w http.ResponseWriter, r *http.Request)
 	}
 
 	var req inviteTemoinRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.InviteID <= 0 {
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || strings.TrimSpace(req.Email) == "" {
 		mapAndWriteError(w, services.ErrValidation)
 		return
 	}
 
-	if err := h.temoignages.InviteTemoin(r.Context(), user.ID, soireeID, req.InviteID); err != nil {
+	if err := h.temoignages.InviteTemoin(r.Context(), user.ID, soireeID, req.Email); err != nil {
 		mapAndWriteError(w, err)
 		return
 	}

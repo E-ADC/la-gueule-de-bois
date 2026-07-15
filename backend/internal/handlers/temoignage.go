@@ -80,6 +80,7 @@ func (h *TemoignageHandler) Add(w http.ResponseWriter, r *http.Request) {
 type temoignageView struct {
 	models.Temoignage
 	AuteurPseudo  string `json:"auteurPseudo"`
+	AuteurAvatar  string `json:"auteurAvatar,omitempty"`
 	VotesPositifs int    `json:"votesPositifs"`
 	VotesNegatifs int    `json:"votesNegatifs"`
 	MonVote       *int   `json:"monVote"`
@@ -117,6 +118,7 @@ func (h *TemoignageHandler) ListBySoiree(w http.ResponseWriter, r *http.Request)
 		view := temoignageView{Temoignage: t}
 		if auteur, err := h.profile.GetPublicProfile(r.Context(), t.AuteurID); err == nil {
 			view.AuteurPseudo = auteur.Pseudo
+			view.AuteurAvatar = auteur.Avatar
 		}
 		positifs, negatifs, err := h.votes.Counts(r.Context(), t.ID)
 		if err == nil {

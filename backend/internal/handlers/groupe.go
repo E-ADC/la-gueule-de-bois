@@ -63,3 +63,18 @@ func (h *GroupeHandler) ListMine(w http.ResponseWriter, r *http.Request) {
 	}
 	writeJSON(w, http.StatusOK, list)
 }
+
+// Get — GET /api/groupes/{id} (page de détail d'un groupe).
+func (h *GroupeHandler) Get(w http.ResponseWriter, r *http.Request) {
+	groupeID, err := idFromURL(r, "id")
+	if err != nil {
+		mapAndWriteError(w, services.ErrValidation)
+		return
+	}
+	g, err := h.groupes.Get(r.Context(), groupeID)
+	if err != nil {
+		mapAndWriteError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, g)
+}

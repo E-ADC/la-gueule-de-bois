@@ -86,6 +86,10 @@ func NewRouter(deps Deps) http.Handler {
 			r.Use(requireAuth)
 			r.Get("/", soireeH.ListMine)
 			r.Post("/", soireeH.Create)
+			// UC09 : soirées où je suis invité comme témoin (route statique,
+			// doit être déclarée avant "/{id}" pour ne pas être capturée par
+			// le paramètre — chi gère correctement cette priorité).
+			r.Get("/invitations", temoignageH.ListInvitedSoirees)
 			r.Get("/{id}", soireeH.Get)
 			r.Put("/{id}", soireeH.Update)
 			r.Delete("/{id}", soireeH.Delete)

@@ -101,3 +101,31 @@ func (r *DemandeAmiRepo) MarkStatut(ctx context.Context, id int64, statut models
 	}
 	return nil
 }
+
+// ListAmis liste les utilisateurs devenus amis (demande acceptée, peu
+// importe qui l'a envoyée).
+func (r *DemandeAmiRepo) ListAmis(ctx context.Context, userID int64) ([]models.User, error) {
+	rows, err := r.pool.Query(ctx, `
+		SELECT u.id, u.pseudo, u.email, u.password_hash, u.avatar, u.bio, u.score, u.role, u.created_at
+		FROM users u
+		JOIN demandes_amis d ON (
+			(d.demandeur_id = $1 AND d.destinataire_id = u.id) OR
+			(d.destinataire_id = $1 AND d.demandeur_id = u.id)
+		)
+		WHERE d.statut = $2
+		ORDER BY u.pseudo`, userID, models.DemandeAmiAcceptee)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	out := []models.User{}
+	for rows.Next() {
+		var u models.User
+		if err := rows.Scan(&u.ID, &u.Pseudo, &u.Email, &u.PasswordHash, &u.Avatar, &u.Bio, &u.Score, &u.Role, &u.CreatedAt); err != nil {
+			return nil, err
+		}
+		out = append(out, u)
+	}
+	return out, rows.Err()
+}

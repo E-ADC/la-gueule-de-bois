@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { classementApi } from '../api/classement'
 import { groupesApi } from '../api/groupes'
 import { ApiError } from '../api/client'
@@ -86,12 +87,12 @@ export function ClassementPage() {
         <div className="card">
           {/* Pas de champ rang dans la réponse : déduit de l'index (liste déjà triée). */}
           {state.entries.map((entry, index) => (
-            <div key={entry.id} className="rank-row">
+            <Link key={entry.id} to={`/utilisateurs/${entry.id}`} className="rank-row">
               <span className="rank">{index + 1}</span>
               <span className="avatar">{entry.pseudo.slice(0, 2).toUpperCase()}</span>
               <span>{entry.pseudo}</span>
               <span className="pts">{entry.score} pts</span>
-            </div>
+            </Link>
           ))}
         </div>
       )}

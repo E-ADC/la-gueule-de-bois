@@ -81,6 +81,8 @@ func NewRouter(deps Deps) http.Handler {
 			r.Get("/", amiH.ListRecues)
 			r.Post("/{id}/repondre", amiH.Repondre)
 		})
+		// Liste des amis (demandes acceptées).
+		r.With(requireAuth).Get("/amis", amiH.ListAmis)
 
 		// UC06/07/08/10 — CRUD soirées + historique + photos.
 		r.Route("/soirees", func(r chi.Router) {

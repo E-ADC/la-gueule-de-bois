@@ -85,6 +85,18 @@ type temoignageView struct {
 	MonVote       *int   `json:"monVote"`
 }
 
+// ListInvitedSoirees — GET /api/soirees/invitations : les soirées où
+// l'utilisateur connecté a été invité comme témoin (UC09).
+func (h *TemoignageHandler) ListInvitedSoirees(w http.ResponseWriter, r *http.Request) {
+	user := UserFromContext(r.Context())
+	list, err := h.temoignages.ListInvitedSoirees(r.Context(), user.ID)
+	if err != nil {
+		mapAndWriteError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, list)
+}
+
 // ListBySoiree — GET /api/soirees/{id}/temoignages.
 func (h *TemoignageHandler) ListBySoiree(w http.ResponseWriter, r *http.Request) {
 	user := UserFromContext(r.Context())

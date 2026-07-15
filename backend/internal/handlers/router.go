@@ -70,6 +70,7 @@ func NewRouter(deps Deps) http.Handler {
 		// UC18 — créer un groupe ; liste de mes groupes.
 		r.With(requireAuth).Post("/groupes", groupeH.Create)
 		r.With(requireAuth).Get("/groupes", groupeH.ListMine)
+		r.With(requireAuth).Get("/groupes/{id}", groupeH.Get)
 		// UC19 — rejoindre un groupe.
 		r.With(requireAuth).Post("/groupes/{id}/membres", groupeH.Join)
 

@@ -48,3 +48,8 @@ func (s *GroupeService) Join(ctx context.Context, userID, groupeID int64) error 
 func (s *GroupeService) ListMine(ctx context.Context, userID int64) ([]models.Groupe, error) {
 	return s.groupes.ListForUser(ctx, userID)
 }
+
+// Get renvoie les informations d'un groupe (page de détail).
+func (s *GroupeService) Get(ctx context.Context, groupeID int64) (*models.Groupe, error) {
+	return s.groupes.GetByID(ctx, groupeID)
+}

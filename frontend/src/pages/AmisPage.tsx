@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
+import { Link } from 'react-router-dom'
 import { amisApi } from '../api/amis'
 import { usersApi } from '../api/users'
 import { ApiError } from '../api/client'
@@ -156,9 +157,9 @@ export function AmisPage() {
           {demandesAffichees.map((demande) => (
             <li key={demande.id} className="card friend-request-card">
               <div className="friend-request-header">
-                <p className="card-title">
+                <Link to={`/utilisateurs/${demande.demandeurId}`} className="card-title">
                   {demande.demandeurPseudo ?? `Utilisateur #${demande.demandeurId}`}
-                </p>
+                </Link>
                 {!resolvingPseudos && (
                   <p className="card-meta">
                     {new Date(demande.createdAt).toLocaleDateString('fr-FR')}
